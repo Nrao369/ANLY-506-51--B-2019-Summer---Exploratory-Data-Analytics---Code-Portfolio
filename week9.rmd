@@ -1,0 +1,90 @@
+---
+title: "Week 9"
+author: "Nikhil Rao"
+date: "7/27/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#Installing package ggplot2 and library datasets
+install.packages("ggplot2")
+library(datasets)
+library(ggplot2)
+```
+
+
+```{r setup, include=TRUE}
+#This created a basic histogram of airquality$Ozone
+library(datasets)
+hist(airquality$Ozone)
+```
+
+
+```{r setup, include=TRUE}
+#createing a basic Scatterplot of Ozone$Wind
+library(datasets)
+with(airquality, plot(Wind, Ozone))
+```
+
+
+```{r setup, include=TRUE}
+#Creating a basic grahic for a Boxplot 
+library(datasets)
+airquality <- transform(airquality, Month = factor(Month))
+boxplot(Ozone ~ Month, airquality, xlab = "Month", ylab = "Ozone (ppb)")
+```
+
+```{r setup, include=TRUE}
+#Creating a base plot with Annotation
+library(datasets)
+with(airquality, plot(Wind, Ozone, main = "Ozone vs Wind in NY"))
+with(subset(airquality, Month == 5), points(Wind, Ozone, col = "blue"))
+```
+
+
+```{r setup, include=TRUE}
+#Creating a base plot of Speed vs Stopping Distance
+data(cars)
+with(cars, plot(speed,dist))
+title("Speed vs Stopping Distance")
+```
+
+
+```{r setup, include=TRUE}
+#This is typlical plot using the ggplot2
+data(mpg)
+qplot(displ,hwy,data = mpg)
+```
+
+
+```{r setup, include=TRUE}
+#Creating a base plot with a Regression Line
+with(airquality, plot(Wind, Ozone, main = "Ozone vs Wind in NY", pch = 20))
+model <- lm(Ozone ~ Wind, airquality)
+abline(model, lwd = 2)
+```
+
+```{r setup, include=TRUE}
+#We will use a plotting function and make a plot appear on the screen device
+with(faithful,plot(eruptions,waiting))
+title(main = "Old Faithful Geyser Data")
+```
+
+
+```{r setup, include=TRUE}
+#Open a PDF file stored in working directory
+pdf(file = "graphicdevice.pdf")
+#This creates a plot and sends it to the above mentioned pdf file 
+with(faithful, plot(eruptions,waiting))
+title(main = "Old Faithful Geyser data")
+dev.off
+```
+
+```{r setup, include=TRUE}
+#Copying plots to a PNG file 
+wiht(faithful, plot(eruptions,waiting))
+title(main = "Old Faithful Geyser Data")
+dev.copy(png, file = "geyserplot.png")
+dev.off
+```

@@ -1,0 +1,115 @@
+---
+title: "Week11"
+author: "Nikhil Rao"
+date: "7/28/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+
+```{r setup, include=FALSE}
+#Principal Component Analysis (PCA) is a useful technique for exploratory data analysis, allowing you to better visualize the variation present in a dataset with many variables. It works best with numerical data, we will exclude the two categorical variables (vs and am) and we are left with matrix of 9 columns and 32 rows, and we use prcomp, and assigning  output to mtcars.pca.
+mtcars.pca <- prcomp(mtcars[,c(1:7,10,11)], center = TRUE,scale. = TRUE)
+
+#Considering the objects of mtcars.pca
+str(mtcars.pca)
+
+```
+
+```{r}
+#PLotting the PCA
+library(devtools)
+install_github("vqv/ggbiplot")
+
+library(ggbiplot)
+ggbiplot(mtcars.pca)
+
+#The axes shown are arrows originating from the center point. We see that the variables hp, cyl, and disp all contribute to PC1, with higher values in those variables moving the samples to the right on this plot.
+
+ggbiplot(mtcars.pca, labels=rownames(mtcars)) #For each point with the car brand
+
+```
+
+```{r}
+#Interpreting the results as shown
+mtcars.country <- c(rep("Japan", 3), rep("US",4), rep("Europe", 7),rep("US",3), "Europe", rep("Japan", 3), rep("US",4), rep("Europe", 3), "US", rep("Europe", 3))
+
+ggbiplot(mtcars.pca,ellipse=TRUE,  labels=rownames(mtcars), groups=mtcars.country)
+#Looking at PC3 and PC4:
+
+ggbiplot(mtcars.pca,ellipse=TRUE,choices=c(3,4),   labels=rownames(mtcars), groups=mtcars.country)
+
+```
+
+```{r}
+#Graphical parameters with ggbiplot
+#We can alter our biplots by  adding a circle to the center of the dataset using (circle argument):
+
+ggbiplot(mtcars.pca,ellipse=TRUE,circle=TRUE, labels=rownames(mtcars), groups=mtcars.country)
+
+#To scale the samples we use the (obs.scale) and the variables (var.scale):
+
+ggbiplot(mtcars.pca,ellipse=TRUE,obs.scale = 1, var.scale = 1,  labels=rownames(mtcars), groups=mtcars.country)
+```
+
+```{r}
+#Using ggbiplot
+#The function is based on the ggplot function and using the same set of graphical parameters to alter the biplots.
+
+# Using scale_colour_manual() to specify the colours to use for the groups with adding a title with ggtitle() and moving the legend with theme()
+
+ggbiplot(mtcars.pca,ellipse=TRUE,obs.scale = 1, var.scale = 1,  labels=rownames(mtcars), groups=mtcars.country) +
+  scale_colour_manual(name="Origin", values= c("pink", "Forest green", "light blue"))+
+  ggtitle("PCA of mtcars dataset")+
+  theme_minimal()+
+  theme(legend.position = "left")
+```
+
+```{r}
+#Ading a new sample to spacecar
+
+spacecar <- c(1000,60,50,500,0,0.5,2.5,0,1,0,0)
+
+mtcarsplus <- rbind(mtcars, spacecar)
+mtcars.countryplus <- c(mtcars.country, "Jupiter")
+
+mtcarsplus.pca <- prcomp(mtcarsplus[,c(1:7,10,11)], center = TRUE,scale. = TRUE)
+
+ggbiplot(mtcarsplus.pca, obs.scale = 1, var.scale = 1, ellipse = TRUE, circle = FALSE, var.axes=TRUE, labels=c(rownames(mtcars), "spacecar"), groups=mtcars.countryplus)+
+  scale_colour_manual(name="Origin", values= c("pink", "forest green", "violet", "light blue"))+
+  ggtitle("PCA of mtcars dataset, with extra sample added")+
+  theme_minimal()+
+  theme(legend.position = "bottom")
+
+```
+
+
+```{r}
+#Scaling the values for spacecar in relation to the PCA's center (mtcars.pca$center) and then let us apply the rotation of the PCA matrix to the spacecar sample.After this we can use  rbind() the projected values for spacecar to the rest of the pca$x
+
+s.sc <- scale(t(spacecar[c(1:7,10,11)]), center= mtcars.pca$center)
+s.pred <- s.sc %*% mtcars.pca$rotation
+
+
+mtcars.plusproj.pca <- mtcars.pca
+mtcars.plusproj.pca$x <- rbind(mtcars.plusproj.pca$x, s.pred)
+
+
+ggbiplot(mtcars.plusproj.pca, obs.scale = 1, var.scale = 1, ellipse = TRUE, circle = FALSE, var.axes=TRUE, labels=c(rownames(mtcars), "spacecar"), groups=mtcars.countryplus)+
+  scale_colour_manual(name="Origin", values= c("forest green", "red3", "pink", "light blue"))+
+  ggtitle("PCA of mtcars dataset with extra sample projected 'Jupiter")+
+  theme_minimal()+
+  theme(legend.position = "right")
+
+```
+
+
+
+
+
+
+
